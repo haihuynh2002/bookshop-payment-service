@@ -1,0 +1,15 @@
+paypal:
+  cancel-url: http://192.168.67.2/payments/cancel
+  success-url: http://192.168.67.2/payments/success
+spring:
+  flyway:
+    url: jdbc:postgresql://bookshop-postgres/bookshopdb_payment
+  r2dbc:
+    url: r2dbc:postgresql://bookshop-postgres/bookshopdb_payment
+  rabbitmq:
+    host: bookshop-rabbitmq
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://bookshop-keycloak/realms/PolarBookshop

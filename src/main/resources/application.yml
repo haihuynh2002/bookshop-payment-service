@@ -1,0 +1,58 @@
+server:
+  port: 9007
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+spring:
+  application:
+    name: payment-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/PolarBookshop
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+  r2dbc:
+    username: user
+    password: password
+    url: r2dbc:postgresql://localhost:5432/bookshopdb_payment
+    pool:
+      max-create-connection-time: 2s
+      initial-size: 5
+      max-size: 10
+  flyway:
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+    url: jdbc:postgresql://localhost:5432/bookshopdb_payment
+  cloud:
+    function:
+      definition: handleOrderEvent;handleDeliveryEvent
+    stream:
+      bindings:
+        handleOrderEvent-in-0:
+          destination: order
+          group: ${spring.application.name}
+        handleDeliveryEvent-in-0:
+          destination: delivery
+          group: ${spring.application.name}
+        payment-out-0:
+          destination: payment
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
+    connection-timeout: 5s
+
+bookshop:
+  order-service-uri: "http://localhost:9002"
+
+paypal:
+  client-id: AWmrrw7uamxejTnTY9pR2sN2QudKmKWTS-U-IpZ6fCql48FcpLRBEB-pDq0bl-t4A33-f0lHT9kd0aji
+  client-secret: EAzo2LbcXLFHqf0WChbjkYOxKOojD-XMznwsMTgj7H2Yd4QhNSD3At6u5xmJ1Fb8efu1fI5lDZCu_gkn
+  mode: sandbox
+  cancel-url: "http://localhost:9000/payments/cancel"
+  success-url: "http://localhost:9000/payments/success"
