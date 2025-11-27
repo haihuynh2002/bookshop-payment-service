@@ -53,6 +53,7 @@ public class PaymentService {
 
     public Flux<Payment> consumeDeliveryEvent(Flux<DeliveryEvent> flux) {
         return flux
+                .filter(event -> !event.getExchange())
                 .flatMap(event -> switch (event.getStatus()) {
                     case DeliveryStatus.SHIPPED -> completePayment(event.getOrderId());
                     case DeliveryStatus.CANCELLED -> cancelPayment(event.getOrderId());
